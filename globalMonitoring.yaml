@@ -1,0 +1,3170 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Global Monitoring
+  description: >
+
+    The Global Monitoring API provides a suite of endpoints to Monitor changes
+    to Company Information. Company changes can be retrieved by creating a
+    Portfolio
+
+    (a collection of companies) and configuring the eventRules (the criteria in
+    which to trigger a change, e.g. company name changes, limit changes) 
+
+    on the portfolio. When a company in your Portfolio changes to satisfy an
+    eventRule, a notificationEvent will be raised to inform
+
+    you of the nature of the change. See here for Creditsafe's Global Monitoring
+    capabilities.
+tags:
+  - name: Authentication
+    description: Endpoints to authenticate and generate an Authentication Token.
+  - name: User Details
+    description: >-
+      Endpoints to retrieve user-specific details, such as user profiles and
+      permissions.
+  - name: Create and View All Portfolios
+    description: >-
+      Endpoints to create new portfolios and retrieve a list of all existing
+      portfolios for monitoring.
+  - name: Importing Portfolios
+    description: >-
+      Endpoints to bulk manage portfolios by importing companies using files in
+      supported formats (e.g., CSV).
+  - name: User Management of Portfolios
+    description: >-
+      Endpoints to manage portfolios at a user level, including
+      updating/deleting portfolio details, managing associated notifications and
+      share portfolios with other users.
+  - name: Individual Portfolio Management
+    description: >-
+      Endpoints to manage specific portfolios, such as adding or removing
+      companies, applying event rules, and viewing portfolio-specific data.
+  - name: Event Rules and Notifications
+    description: >-
+      Endpoints to viewing event rules for monitoring and retrieve notifications
+      triggered by changes in monitored companies.
+x-tagGroups:
+  - name: Authentication
+    tags:
+      - Authentication
+  - name: Administration
+    tags:
+      - User Details
+  - name: Portfolio Management
+    tags:
+      - Create and View All Portfolios
+      - Importing Portfolios
+      - User Management of Portfolios
+      - Individual Portfolio Management
+  - name: Monitoring Rules and Notifications
+    tags:
+      - Event Rules and Notifications
+servers:
+  - url: https://connect.sandbox.creditsafe.com/v1
+    description: Sandbox server
+  - url: https://connect.creditsafe.com/v1
+    description: Production server
+paths:
+  /authenticate:
+    post:
+      operationId: authenticate
+      summary: Authenticate
+      security: []
+      tags:
+        - Authentication
+      description: |
+        Supply username and password to generate Authentication Token.
+          
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectAuthenticationAuthRequest'
+        required: false
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectAuthenticationAuthResponse'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+  /monitoring/user/details:
+    get:
+      tags:
+        - User Details
+      description: >-
+        You would use this endpoint to retrieve the user details related to the
+        Global Monitoring product, such as the user's information.
+      operationId: monitoringUserDetails
+      summary: Monitoring User Details
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringUserDetails'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios:
+    get:
+      tags:
+        - Create and View All Portfolios
+      description: >-
+        This endpoint allows you to manage portfolios. You can use the GET
+        method to retrieve all portfolios associated with the user.
+      operationId: listAllPortfolios
+      summary: List All Portfolios
+      parameters:
+        - name: searchQuery
+          in: query
+          description: Return portfolios that match the given value
+          schema:
+            type: string
+        - $ref: '#/components/parameters/gmPage'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringListPortfolios'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    post:
+      tags:
+        - Create and View All Portfolios
+      description: >-
+        This endpoint to create a new Portfolio based on the supplied
+        criteria.<br><br> A portfolio can contain any number of companies that
+        you wish to monitor changes to. The only required Body parameter is
+        "name" for Connect users.
+      operationId: createMonitoringPortfolio
+      summary: Create Monitoring Portfolio
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMonitoringCreatePortfolioRequest'
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringCreatePortfolioResponse'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/import:
+    post:
+      tags:
+        - Importing Portfolios
+      description: >-
+        Endpoint allows you to import a list of companies to add to the selected
+        portfolio along with some personal information for the company.
+        Importing a portfolio will add the companies to the specified portfolio,
+        duplicates in the import file will be ignored.You may also optionally
+        add an email to the body of the request and get an email notification
+        when the import is processed..
+      operationId: importAPortfolioFile
+      summary: Import A Portfolio File
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: >-
+                #/components/schemas/ConnectMonitoringImportAndSyncPortfolioRequest
+            example:
+              importCsv: FILE_PATH
+              email: john.smith@creditsafe.com
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringImportAndSyncPortfolioResponse
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/sync:
+    post:
+      tags:
+        - Importing Portfolios
+      description: >-
+        Endpoint allows you to sync a portfolio file with your portfolio. Sync
+        action will delete all companies in your specified portfolio, and then
+        add the companies from the file into the portfolio.
+      operationId: syncAPortfolioFile
+      summary: Sync A Portfolio File
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: >-
+                #/components/schemas/ConnectMonitoringImportAndSyncPortfolioRequest
+            example:
+              importCsv: FILE_PATH
+              email: john.smith@creditsafe.com
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringImportAndSyncPortfolioResponse
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}:
+    get:
+      tags:
+        - User Management of Portfolios
+      description: >-
+        This endpoint allows you to retrieve the portfolio details from the
+        portfolioId.
+      operationId: retrievePortfolioById
+      summary: Retrieve Portfolio By Id
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: >-
+            The unique identifier for the portfolio that you wish to retrieve,
+            obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringGetPortfolioById'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    delete:
+      tags:
+        - User Management of Portfolios
+      description: This endpoint allows you to delete the portfolio using the portfolioId.
+      operationId: deletePortfolio
+      summary: Delete Portfolio
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: >-
+            The unique identifier of the portfolio that you wish to delete,
+            obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringDeletePortfolio'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    patch:
+      tags:
+        - User Management of Portfolios
+      description: >-
+        This endpoint allows you to update Portfolio details such as Name, email
+        recipients, language and subject line.
+      operationId: updatePortfolioDetails
+      summary: Update Portfolio Details
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMonitoringUpdatePortfolioRequest'
+            example:
+              name: New portfolio Name
+              emails:
+                - firstName: John
+                  lastName: Smith
+                  emailAddress: john.smith@creditsafe.com
+              frequency: '1'
+        required: true
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/countries:
+    get:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        This endpoint provides a list of distinct countries associated with the
+        companies monitored within a specific portfolio.
+      operationId: listCountriesOfMonitoredCompanies
+      summary: List Countries of Monitored Companies
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringMonitoredCountriesInPortfolio
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/companies:
+    get:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        This endpoints gets all companies from a specific portfolio based on the
+        portfolio id, optionally filter with query parameters.
+      operationId: listCompaniesInAPortfolio
+      summary: List Companies In A Portfolio
+      parameters:
+        - name: searchQuery
+          in: query
+          description: Return companies that match the given value
+          schema:
+            type: string
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/gmPage'
+        - name: countryCode
+          in: query
+          description: Return companies from the portfolio that match the given countryCode
+          schema:
+            type: string
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringCompaniesInAPortfolio'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    post:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        Endpoint to add a company using a company id, into a portfolio provided
+        in as a path parameter. Additional fields can be used to add a
+        personalReference, freeText, and personalLimit. These fields need to be
+        submitted in the requestBody but can be 'nulled' if not required. See
+        the two examples of the submission with and without these fields.
+      operationId: addCompanyToPortfolio
+      summary: Add Company To Portfolio
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/ConnectMonitoringAddCompanyToPortfolioRequest
+            examples:
+              id only:
+                summary: Submitting a requestBody with only an 'id'
+                value:
+                  id: GB-0-12345678
+                  personalReference: ''
+                  freeText: ''
+                  personalLimit: ''
+              All Fields:
+                summary: Submitting a requestBody with all fields
+                value:
+                  id: GB-0-12345678
+                  personalReference: Some Text
+                  freeText: Some Useful Text
+                  personalLimit: '40'
+        required: false
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringAddCompanyToPortfolioResponse
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+        '409':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceConflictResponse
+  /monitoring/portfolios/{portfolioId}/companies/copy:
+    post:
+      tags:
+        - User Management of Portfolios
+      description: >-
+        This endpoint allows you to copy companies from one portfolio to
+        another. You can specify the source and destination portfolios to
+        perform the copy operation.
+      operationId: copyCompaniesBetweenPortfolios
+      summary: Copy Companies Between Portfolios
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: >-
+            The unique identifier of the portfolio you want to copy companies
+            from, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: copyAll
+          in: query
+          description: >-
+            When CopyAll query parameter is False, portfolios and companies list
+            needs to be passed. When CopyAll query parameter is True, only
+            portfolios need to be passed and companies List must be empty. All
+            companies are copied from current portfolio are considered here.
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/ConnectMonitoringCopyAndMoveCompaniesRequest
+            example:
+              portfolios:
+                - 196854
+                - 197369
+              companies:
+                - id: BE-X-733313367
+                - id: BE-X-868222848
+                - id: BE-X-835695382
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringCopyAndMoveCompaniesResponse
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/companies/remove:
+    post:
+      tags:
+        - User Management of Portfolios
+      description: >-
+        This endpoint allows you to move companies from one portfolio to single
+        (or) multiple portfolios. Removes the companies from the portfolio
+        provided in the path parameter.
+      operationId: moveCompaniesBetweenPortfolios
+      summary: Move Companies Between Portfolios
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: >-
+            The unique identifier of the portfolio you want to move companies
+            from, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: removeAll
+          in: query
+          description: >-
+            When RemoveAll query parameter is False, a portfolios and companies
+            list needs to be passed. When RemoveAll query parameter is True,
+            only portfolios need to be passed and companies List must be empty.
+            All companies are moved and deleted from current portfolio.
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/ConnectMonitoringCopyAndMoveCompaniesRequest
+            example:
+              portfolios:
+                - 196854
+                - 197369
+              companies:
+                - id: BE-X-733313367
+                - id: BE-X-868222848
+                - id: BE-X-835695382
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringCopyAndMoveCompaniesResponse
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/companies/clear:
+    patch:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        This endpoint allows for companies to be deleted from the specified
+        portfolio.
+      operationId: clearCompaniesFromPortfolio
+      summary: Clear Companies From Portfolio
+      parameters:
+        - name: clearAll
+          in: query
+          description: >-
+            When ClearAll query parameter is False,Companies List needs to be
+            passed. When ClearAll query parameter is True, Companies List must
+            be empty. All companies will be deleted
+          schema:
+            type: boolean
+            default: false
+        - name: portfolioId
+          in: path
+          required: true
+          description: >-
+            The unique identifier of the portfolio you want to delete companies
+            from, obtained from `/portfolios`.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMonitoringClearCompaniesRequest'
+            example:
+              companies:
+                - BE-X-733313367
+                - BE-X-868222848
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringClearCompaniesResponse'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/companies/{companyId}:
+    get:
+      tags:
+        - Individual Portfolio Management
+      operationId: getCompanyDetailsFromAPortfolio
+      summary: Get Company Details From A Portfolio
+      description: >-
+        This endpoint allows you to get various company details from a
+        portfolio. Requires a portfolioID and companyID in the PATH of the
+        request.
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: companyId
+          in: path
+          required: true
+          description: A company Safe Number or Connect ID.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringGetCompanyFromPortfolio'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    delete:
+      tags:
+        - Individual Portfolio Management
+      description: Endpoint to delete a company from a portfolio.
+      operationId: deleteCompanyFromPortfolio
+      summary: Delete Company From Portfolio
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: companyId
+          in: path
+          required: true
+          description: A company Safe Number or Connect ID.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringDeleteCompanyFromPortfolio
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    patch:
+      tags:
+        - Individual Portfolio Management
+      description: Updates the company details in a specified portfolio.
+      operationId: updateCompanyDetailsInPortfolio
+      summary: Update Company Details In Portfolio
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: companyId
+          in: path
+          required: true
+          description: A company Safe Number or Connect ID.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: >-
+                #/components/schemas/ConnectMonitoringUpdateCompanyDetailsInPortfolioRequest
+            example:
+              personalReference: personal reference
+              freeText: Some useful text
+              personalLimit: '40'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringUpdateCompanyInPortfolio'
+        '204':
+          description: No Content
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/eventRules:
+    get:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        Get all notification `eventRules` for the given `portfolioId`.
+        Notification event rules allow you to control which events you wish to
+        monitor for the `companies` contained within the given `portfolio`.
+      operationId: listPortfolioEventRules
+      summary: List Portfolio Event Rules
+      parameters:
+        - name: portfolioId
+          in: path
+          description: >-
+            The unique identifier for the portfolio that you wish to retrieve
+            notification event rules for, obtained from `/portfolios`.
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringListPortfolioEventRules'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/eventRules/{countryCode}:
+    get:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        Endpoint to that lists all the eventRules, their status and parameters
+        based on a portfolio Id, filtered by country. Newly created portfolios
+        are without any notification event rules by default, but you can switch
+        rules on/off per country or on a global basis. There are different rules
+        available for each country due to the different type of change event
+        data that's available. The following GET request lists all the available
+        rules for a portfolio.
+      operationId: listPortfolioEventRulesByCountry
+      summary: List Portfolio Event Rules By Country
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: countryCode
+          in: path
+          description: >-
+            Country code to show events for. <br> Please note that there is one
+            exception in that `PLC` is the only 3-character that can be accepted
+            here.
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringListPortfolioEventRules'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    put:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        Endpoint to update an eventRule in a portfolio. Must provide a portfolio
+        unique identifier and a country code in the URL of the PUT request. The
+        Body of the request must contain the `ruleCode` number of the eventRule
+        you want to update, with an `isActive` parameter. Some event rules may
+        also contain specific parameters, which can be set with `param0`,
+        `param1` and `param2`. parameters. Get the above information by calling
+        the List All eventRules endpoint. <br><br> **Important Note**<br> It is
+        recommended that any changes made to the `Event Rules` are verified
+        using the [List Portfolio Event Rules
+        Endpoint](#listPortfolioEventRules) after the PUT call has been made.
+      operationId: updateEventRules
+      summary: Update EventRules
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+        - name: countryCode
+          in: path
+          description: Country code to show events for
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            type: string
+      requestBody:
+        description: >-
+          To ensure optimal processing efficiency when updating live event
+          rules—whether for removal, addition, or status change—it is best
+          practice to update the entire list of rules in a single operation.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMonitoringUpdateEventRulesRequest'
+            example:
+              - ruleCode: 101
+                isActive: 1
+                param0: true
+                param1: '15'
+                param2: '10'
+              - ruleCode: 1802
+                isActive: 1
+                param0: '10'
+              - ruleCode: 1815
+                isActive: 0
+        required: true
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/eventRules/setDefault:
+    put:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        Update a portfolios event rules to default state. In Connect, default
+        state means all rules are turned off.
+      operationId: setPortfolioDefaultRules
+      summary: Set Portfolio Default Rules
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/riskSummary:
+    get:
+      tags:
+        - Individual Portfolio Management
+      description: Get current portfolio risk summary information.
+      operationId: portfolioRiskSummary
+      summary: Portfolio Risk Summary
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringRiskSummary'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/notificationEvents:
+    get:
+      tags:
+        - Individual Portfolio Management
+      description: >-
+        Get all notificationEvents based on the portfolio id, optionally filter
+        with query parameters.
+      operationId: listPortfolioNotifications
+      summary: List Portfolio Notifications
+      parameters:
+        - name: searchQuery
+          in: query
+          description: Return notificationEvents that match the given value
+          schema:
+            type: string
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/sortDir'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/gmPage'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+        - $ref: '#/components/parameters/filterByCreatedDate'
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringAllNotificationsEvents'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/companies/{companyId}/notificationEvents:
+    get:
+      tags:
+        - Individual Portfolio Management
+      operationId: listCompanySpecificNotificationEvents
+      summary: List Company Specific NotificationEvents
+      description: >-
+        List of notification events based on the company id,optionally filtered
+        with query parameters.
+      parameters:
+        - name: searchQuery
+          in: query
+          description: Return notificationEvents that match the given value
+          schema:
+            type: string
+        - $ref: '#/components/parameters/sortDir'
+        - name: pageSize
+          in: query
+          description: Number of items to return per Page (max 1000)
+          schema:
+            type: integer
+            default: 50
+        - $ref: '#/components/parameters/gmPage'
+        - name: isProcessed
+          in: query
+          description: >-
+            A flag that can be set to `true` boolean value to mark it as an
+            event that has been actioned.
+          schema:
+            type: boolean
+            enum:
+              - true
+              - false
+        - name: sortBy
+          in: query
+          description: >-
+            Sort results by this column. Null values of sort column are listed
+            after non-nulls.
+          schema:
+            type: string
+            default: companyName
+            enum:
+              - companyName
+              - countryCode
+              - eventId
+              - eventDate
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: string
+        - name: companyId
+          in: path
+          required: true
+          description: A company Safe Number or Connect ID.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/portfolios/{portfolioId}/sharingPermissions:
+    get:
+      tags:
+        - User Management of Portfolios
+      operationId: portfolioUserPermissions
+      summary: Portfolio User Permissions
+      description: Retrieve user permissions within the customer for a portfolio.
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringListSharingPermissions'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+    patch:
+      tags:
+        - User Management of Portfolios
+      description: Update/Create user permissions within the customer for portfolio.
+      operationId: sharePortfolioWithUsers
+      summary: Share Portfolio With Users
+      parameters:
+        - name: portfolioId
+          in: path
+          required: true
+          description: The unique identifier of the portfolio, obtained from `/portfolios`.
+          schema:
+            type: number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMonitoringSharePortfolioRequest'
+            example:
+              revokeAll: 'false'
+              userPermissions:
+                - csUserId: 101106166
+                  permissions: View,Add
+                - csUserId: 1000027380
+                  permissions: View,Add,Edit,Remove
+        required: true
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectMonitoringSharePortfolioRequestResponse
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/companies/{id}/events:
+    get:
+      tags:
+        - Event Rules and Notifications
+      description: >-
+        Endpoint to return a collection of `events` for the given company,
+        optionally filtered on the supplied search criteria. Event information
+        will only be returned if the company exists in at least one of your
+        `portfolios`.
+      operationId: listCompanyEvents
+      summary: List Company Events
+      parameters:
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+        - $ref: '#/components/parameters/gmPage'
+        - $ref: '#/components/parameters/pageSize'
+        - name: id
+          in: path
+          description: The connectId of the company that you wish to retrieve events for.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringCompanyEvents'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/eventRules:
+    get:
+      tags:
+        - Event Rules and Notifications
+      description: >-
+        Get all available notification event rules. Notification event rules
+        allow you to control which events you wish to monitor for the
+        `companies` contained within a given `portfolio`.
+      operationId: allEventRules
+      summary: All EventRules
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringEventRulesResponse'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/eventRules/{countryCode}:
+    get:
+      tags:
+        - Event Rules and Notifications
+      description: >-
+        Get all available notification event rules for the given `countryCode`.
+        Notification event rules allow you to control which events you wish to
+        monitor for the `companies` contained within a given `portfolio`.
+      operationId: filteredEventRules
+      summary: Filtered EventRules
+      parameters:
+        - name: countryCode
+          in: path
+          description: >-
+            ISO/Alpha 2 format country code for which notification event rules
+            will be returned.
+          required: true
+          schema:
+            maxLength: 2
+            minLength: 2
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringEventRulesResponse'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+  /monitoring/notificationEvents:
+    get:
+      tags:
+        - Event Rules and Notifications
+      description: >-
+        Get all notification events generated for companies monitored in your
+        portfolios, based on the notification rules enabled. The notification
+        events returned will be filtered based upon the supplied search
+        criteria.
+      operationId: allNotificationEvents
+      summary: All Notification Events
+      parameters:
+        - name: searchQuery
+          in: query
+          description: Return notificationEvents that match the given value
+          schema:
+            type: string
+        - $ref: '#/components/parameters/sortBy'
+        - $ref: '#/components/parameters/sortDir'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+        - $ref: '#/components/parameters/gmPage'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/filterByCreatedDate'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMonitoringAllNotificationsEvents'
+        '400':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesBadRequest'
+        '401':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesInvalidToken'
+        '403':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectErrorResponsesAccessForbidden'
+        '404':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: >-
+                  #/components/schemas/ConnectErrorResponsesResourceNotFoundRequest
+components:
+  securitySchemes:
+    bearerToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >-
+        This API requires authentication for access to protected endpoints.
+        Authentication is performed by providing a valid JWT token in the
+        `Authorization` header of each request.
+  schemas:
+    ConnectAuthenticationAuthRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Credentials assigned upon sign up
+          example: username@domain.com
+        password:
+          type: string
+          example: ^1gHySRA56aj>tf421o
+    ConnectAuthenticationAuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Authentication Token
+          example: >-
+            eyJhbGciOiJSUzI1NiIsImtpZCI6ImRodTNnNkFtTG5QQXVpOEJSMUFEVnp5ZHBnZyIsInR5cCI6IkpXVCIsIng1dCI6ImRodTNnNkFtTG5QQXVpOEJSMUFEVnp5ZHBnZyJ9.eyJuYmYiOjE1OTU0MTYyMDksImV4cCI6MTU5NTQxOTgwOSwiaXNzIjoiaHR0cHM6Ly9teWxvZ2luLnRlc3QuY3JlZGl0c2FmZS5jb20iLCJhdWQiOlsiaHR0cHM6Ly9teWxvZ2luLnRlc3QuY3JlZGl0c2FmZS5jb20vcmVzb3VyY2VzIiwiY29ubmVjdF9hcGkiLCJ1Ym9fYXBpX2dhdGV3YXkiXSwiY2xpZW50X2lkIjoiY29ubmVjdC5hcGkuY2xpZW50Iiwic3ViIjoiMTAxNTIwMjg1IiwiYXV0aF90aW1lIjoxNTk1NDE2MjA5LCJpZHAiOiJsb2NhbCIsInVzZXJuYW1lIjoiQ29ubmVjdHUxIiwiZW1haWwiOiJDb25uZWN0MUBnbWFpbC5jb20iLCJjdXN0b21lcklkIjoiMTAxNzY0NDA1IiwiY291bnRyeSI6IkMwIiwidXNlclJvbGUiOiJDcm1BZG1pblBsdXMiLCJzYl9jb3VudHJ5IjoiVVMiLCJzY29wZSI6WyJjb25uZWN0X2FwaSIsInVib19hcGlfZ2F0ZXdheSJdLCJhbXIiOlsicHdkIl19.p8kPAlKNB9iWEKiQbfbRXBoLQuBG7NuEDN__A8AQ55CL-gcIwkS1717Af1f9W0uifwIQ6HAZQR_x191LVkvuWD94Zw8zLzzr1ioUIhQny_zYuAS3G6EFNaTHh_mvOQ9XVi1FyuIy6YYcYcNLNZurFuITF2w5LuX4YQBjQy3rhEAdRoKcUKbtCClMFaH2dV35jiX2d7BqyhtJ8GeZyJ6yfMfdzznqxlJ4Osf5aasKUy8RYKEpjU2pkCURojoy5_oviGs8X4U9mJWcuajmPF3i5DHkqbhq1Mp0UZrDyoq_0BDStV5xqRgq6aOY8mc45kX7cwY3O2hPeGE7Ak8YtKFbA
+    ConnectErrorResponsesInvalidToken:
+      type: object
+      properties:
+        error:
+          type: string
+      description: >-
+        401 - Authorization Token has either expired or is not a valid Connect
+        Token
+    ConnectMonitoringUserDetails:
+      type: array
+      items:
+        properties:
+          countryCode:
+            type: string
+            example: US
+            description: The ISO/Alpha 2 format country code for the user's country.
+          createdDate:
+            type: string
+            format: date-time
+            example: '2020-01-01T00:00:00'
+            description: The date that the Global Monitoring user account was created.
+          csCustomerId:
+            type: number
+            example: 101662701
+            description: >-
+              The unique identifier for the user's customer account, used across
+              the Creditsafe product suite.
+          csUserId:
+            type: number
+            example: 101445010
+            description: >-
+              The unique identifier for the user's account, used across the
+              Creditsafe product suite.
+          isAutoTracker:
+            type: boolean
+            example: false
+            description: >-
+              If auto-tracker is enabled, any companies that you pull a credit
+              report for are automatically added to the portfolio that you have
+              selected as default.
+          languageCode:
+            type: string
+            example: en
+            description: The language code for the user's preferred language.
+          lastAccessDate:
+            type: string
+            nullable: true
+            format: date-time
+            example: '2020-02-01T14:30:00'
+            description: The date the the user last accessed the Global Monitoring product.
+          modifiedDate:
+            type: string
+            nullable: true
+            format: date-time
+            example: '2020-02-01T14:30:00'
+            description: The date that the user's details were last modified.
+          contractEndDate:
+            type: string
+            nullable: true
+            format: date-time
+            example: '2021-01-01T00:00:00'
+            description: >-
+              The date that the user's contract is currently set to expire. From
+              this date onward, the user will be unable to access to Global
+              Monitoring product.
+          userId:
+            type: number
+            example: 10804
+            description: >-
+              The internal identifier used to reference the user's account
+              through the Global Monitoring product.
+    ConnectErrorResponsesBadRequest:
+      type: object
+      description: Bad Request
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+        message:
+          type: string
+        details:
+          type: string
+          description: Provides further information on why the request was rejected
+    ConnectErrorResponsesAccessForbidden:
+      type: object
+      description: 403 - Access Forbidden
+      properties:
+        message:
+          type: string
+          example: Access forbidden
+    ConnectErrorResponsesResourceNotFoundRequest:
+      type: object
+      description: 404 - Not Found
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          format: uuid
+        message:
+          type: string
+        details:
+          type: string
+          description: Provides further information on why the request was rejected
+    ConnectMonitoringPaging:
+      type: object
+      description: Paging parameters.
+      properties:
+        size:
+          type: number
+          nullable: true
+          description: The maximum number of results returned per page.
+          example: 10
+        prev:
+          type: number
+          nullable: true
+          description: >-
+            The page number of the previous page, null if there is no previous
+            page available.
+          example: 0
+        next:
+          type: number
+          nullable: true
+          description: >-
+            The page number of the next page, null if there is no next page
+            available.
+          example: 2
+        last:
+          type: number
+          nullable: true
+          description: The page number of the last page.
+          example: 3
+    ConnectMonitoringListPortfolios:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        totalCount:
+          type: number
+          description: The total number of events returned for the given company.
+          example: 1
+        paging:
+          $ref: '#/components/schemas/ConnectMonitoringPaging'
+        data:
+          type: object
+          properties:
+            portfolios:
+              type: array
+              items:
+                properties:
+                  portfolioId:
+                    type: number
+                    description: A unique ID assigned to each portfolio.
+                    example: 131318
+                  name:
+                    type: string
+                    description: The name of the portfolio
+                    example: Customers 2
+                  isDefault:
+                    type: string
+                    description: >-
+                      A true or false value which shows if the portfolio is set
+                      as default
+                    example: false
+                  emails:
+                    type: array
+                    items:
+                      properties:
+                        firstName:
+                          type: string
+                          description: >-
+                            The first name of the user to receive the email
+                            notification.
+                          example: John
+                        lastName:
+                          type: string
+                          description: >-
+                            The last name of the user to receive the email
+                            notification.
+                          example: Doe
+                        email:
+                          type: string
+                          description: >-
+                            The email address of the user to receive the email
+                            notification.
+                          example: john.doe@creditsafe.com
+                  isSharedPortfolio:
+                    type: number
+                    description: >-
+                      Shows if the portfolio is shared with other users or not.
+                      1 means the portfolio is shared.
+                    example: 1
+            sharedPortfolios:
+              type: array
+              nullable: true
+              items:
+                properties:
+                  portfolioId:
+                    type: number
+                    description: A unique ID assigned to each portfolio.
+                    example: 131318
+                  name:
+                    type: string
+                    description: A name of the portfolio
+                    example: Customers 2
+    ConnectMonitoringCreatePortfolioRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the portfolio
+          example: Test Portfolio
+        isDefault:
+          type: boolean
+          description: can set the portfolio as default for company monitoring events.
+          example: false
+        emails:
+          type: array
+          description: The email address of the user to receive the email notification.
+          items:
+            properties:
+              firstName:
+                type: string
+                description: The first name of the user to receive the email notification.
+                example: John
+              lastName:
+                type: string
+                description: The last name of the user to receive the email notification.
+                example: Doe
+              emailAddress:
+                type: string
+                description: >-
+                  The email address of the user to receive the email
+                  notification.
+                example: john.doe@creditsafe.com
+        emailSubject:
+          type: string
+          description: The subject of the email notification.
+          example: Creditsafe Monitoring Notification on portfolio {{portfolioName}}
+        emailLanguage:
+          type: string
+          description: The language of the email notification.
+          example: en
+        frequency:
+          type: string
+      required:
+        - name
+    ConnectMonitoringCreatePortfolioResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 14cc64a0-c108-11ea-b9af-06bcc69a383e
+        portfolioId:
+          type: number
+          description: A unique ID assigned to each portfolio.
+          example: 131318
+        name:
+          type: string
+          description: The name that was assigned to this portfolio
+          example: My New Portfolio
+        isDefault:
+          type: boolean
+          description: Shows if the portfolio is set as Default for the user.
+          example: false
+    ConnectMonitoringImportAndSyncPortfolioRequest:
+      type: object
+      properties:
+        importcsv:
+          type: string
+          format: binary
+          description: The import file ideally needs to be a .csv file.
+        email:
+          type: string
+          description: >-
+            Option field. Provide an email and get a notification when the
+            import has been completed with the details about the import.
+          example: john.smith@creditsafe.com
+    ConnectMonitoringImportAndSyncPortfolioResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        status:
+          type: string
+          description: A message about the status of this request.
+          example: Accepted for processing. Import Id 339523
+    ConnectMonitoringGetPortfolioById:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        portfolioId:
+          type: number
+          description: A unique ID assigned to each portfolio.
+          example: 36
+        name:
+          type: string
+          description: The name of the portfolio
+          example: Customers 2
+        isDefault:
+          type: boolean
+          description: States if the portfolio is set as Default or not
+          example: false
+        emailSubject:
+          type: string
+          description: The subject of the email notification.
+          example: Creditsafe Monitoring Notification on portfolio {{portfolioName}}
+        emails:
+          type: array
+          description: The email addresses of the user to receive the email notification.
+          items:
+            properties:
+              firstName:
+                type: string
+                description: The first name of the user to receive the email notification.
+                example: John
+              lastName:
+                type: string
+                description: The last name of the user to receive the email notification.
+                example: Doe
+              emailAddress:
+                type: string
+                description: >-
+                  The email address of the user to receive the email
+                  notification.
+                example: john.doe@creditsafe.com
+    ConnectMonitoringDeletePortfolio:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message stating if your request was successful
+          example: Portfolio removed and service usage will be updated shortly
+    ConnectMonitoringUpdatePortfolioRequestEmail:
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: The first name of the user to receive the email notification.
+        lastName:
+          type: string
+          description: The last name of the user to receive the email notification.
+        emailAddress:
+          type: string
+          description: The email address of the user to receive the email notification.
+      required:
+        - emailAddress
+    ConnectMonitoringUpdatePortfolioRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the portfolio
+        isDefault:
+          type: boolean
+          description: >-
+            Change the setting of the portfolio as default for company
+            monitoring events.<br><br> Changing the default portfolio will
+            automatically change the status of the previous default to 'false'.
+        emails:
+          type: array
+          description: The email addresses of the user to receive the email notification.
+          items:
+            $ref: '#/components/schemas/ConnectMonitoringUpdatePortfolioRequestEmail'
+        emailSubject:
+          type: string
+          description: The subject of the email notification.
+        emailLanguage:
+          type: string
+          description: The language of the email notification.
+        frequency:
+          type: string
+          description: For emails to be activated you must submit a value of '1'
+      required:
+        - name
+    ConnectMonitoringMonitoredCountriesInPortfolio:
+      type: array
+      items:
+        type: string
+      example:
+        - FR
+        - LU
+        - DE
+    ConnectMonitoringCompaniesInAPortfolio:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        totalCount:
+          type: number
+          description: The total number of events returned for the given company.
+          example: 1
+        paging:
+          $ref: '#/components/schemas/ConnectMonitoringPaging'
+        data:
+          type: array
+          items:
+            properties:
+              id:
+                type: string
+                description: >-
+                  The connectId of the company. A connectId is the primary
+                  Company identifier that is used to uniquely identify all
+                  companies across Creditsafe's Universe and Partner Network.
+                example: US-X-US22384484
+              safeNumber:
+                type: string
+                description: >-
+                  The Safe Number (Creditsafe's identifier on all Companies
+                  owned in the Creditsafe Universe) of the company.
+                example: US22384484
+              name:
+                type: string
+                description: The name of the company .
+                example: GOOGLE LLC
+              address:
+                type: string
+                description: The address of the company.
+                example: VIA PABLO NERUDA, 4, TREZZANO SUL NAVIGLIO, 20090
+              countryCode:
+                type: string
+                description: ISO/Alpha 2 format country code of the company.
+                example: US
+              portfolioId:
+                type: number
+                description: The portfolio Id of the portfolio that contains the company.
+                example: 589960
+              creditLimit:
+                type: number
+                description: The credit limit of the company.
+                example: 10000
+                nullable: true
+              dateLastEvent:
+                type: string
+                description: The date of the most recent event the company has had.
+                example: '2018-06-14T00:59:06'
+                nullable: true
+              freeText:
+                type: string
+                description: >-
+                  Field that can be used to add a free text note to when adding
+                  a company to a portfolio.
+                example: null
+                nullable: true
+              personalLimit:
+                type: string
+                description: >-
+                  Field that can be used to add a personal limit number against
+                  the company in a portfolio.
+                example: 10000
+                nullable: true
+              personalReference:
+                type: string
+                description: >-
+                  Field that can be used to add a personal reference against the
+                  company in a portfolio.
+                example: Follow up Jan 2021
+                nullable: true
+              ratingCommon:
+                type: string
+                description: The rating score band that the company is in.
+                example: A
+                nullable: true
+              ratingLocal:
+                type: string
+                description: Country specific rating score.
+                example: Not rated - insufficient information to rate
+                nullable: true
+              companyStatus:
+                type: string
+                description: The current status of the company
+                example: 1
+                nullable: true
+              dateAdded:
+                type: string
+                format: date-time
+              dateModified:
+                type: string
+                format: date-time
+    ConnectMonitoringAddCompanyToPortfolioRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The company Safe Number or Connect ID
+        personalReference:
+          description: A personal reference for the company
+          type: string
+          nullable: true
+        freeText:
+          description: >-
+            A free field to add any additional text to the company in the
+            portfolio
+          type: string
+          nullable: true
+        personalLimit:
+          description: A personal limit for the company - separate from the credit limit
+          type: string
+          nullable: true
+      required:
+        - id
+        - personalReference
+        - freeText
+        - personalLimit
+    ConnectMonitoringAddCompanyToPortfolioResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        message:
+          type: string
+          description: A status message relating to your request.
+          example: Company Added
+    ConnectErrorResponsesResourceConflictResponse:
+      type: object
+      description: 409 - Conflict
+      properties:
+        correlationId:
+          description: The unique identifier. (A UUID specified by RFC4122).
+          type: string
+          format: uuid
+        message:
+          type: string
+        details:
+          type: string
+          description: Provides further information on why the request was rejected
+    ConnectMonitoringCopyAndMoveCompaniesBodyCompanies:
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            Company Safe Number or Connect ID. Not required when copyAll query
+            parameter is set to true.
+    ConnectMonitoringCopyAndMoveCompaniesRequest:
+      type: object
+      properties:
+        portfolios:
+          description: Comma separated portfolioId(s).
+          type: array
+          items:
+            type: integer
+            description: Comma separated portfolioId(s)
+        companies:
+          description: Array of companies to copy.
+          type: array
+          items:
+            $ref: >-
+              #/components/schemas/ConnectMonitoringCopyAndMoveCompaniesBodyCompanies
+      required:
+        - portfolios
+    ConnectMonitoringCopyAndMoveCompaniesResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        data:
+          type: object
+          properties:
+            totalPortfoliosCompanies:
+              type: integer
+              description: Total amount of companies attempted to copy.
+              example: 5
+            successfulPortfoliosCompanies:
+              type: integer
+              description: Amount of companies successfully copied.
+              example: 3
+            failedPortfoliosCompanies:
+              type: integer
+              description: Amount of companies successfully copied.
+              example: 2
+            reason:
+              type: string
+              description: A message with a reason for why there was failures.
+              example: Duplicate entry '199483-FR00002855' for key 'PRIMARY
+    ConnectMonitoringClearCompaniesRequest:
+      type: object
+      properties:
+        companies:
+          type: array
+          items:
+            type: string
+      description: >-
+        Comma separated Company Safe Number or Connect ID. Not required when
+        copyAll query parameter is set to true.
+    ConnectMonitoringClearCompaniesResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        message:
+          type: string
+          description: A message stating if your request was successful.
+          example: Companies deleted from portfolio
+    ConnectMonitoringGetCompanyFromPortfolio:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        connectId:
+          type: string
+          description: >-
+            The connectId of the company. A connectId is the primary Company
+            identifier that is used to uniquely identify all companies across
+            Creditsafe's Universe and Partner Network.
+          example: US-X-US22384484
+        portfolioId:
+          type: number
+          description: The portfolio Id of the portfolio that contains the company.
+          example: 589960
+        personalReference:
+          type: string
+          description: >-
+            Field that can be used to add a personal reference against the
+            company in a portfolio.
+          example: Follow up Jan 2021
+          nullable: true
+        freeText:
+          type: string
+          description: >-
+            Field that can be used to add a free text note to when adding a
+            company to a portfolio.
+          example: null
+          nullable: true
+        personalLimit:
+          type: string
+          description: >-
+            Field that can be used to add a personal limit number against the
+            company in a portfolio.
+          example: 10000
+          nullable: true
+        safeNumber:
+          type: string
+          description: >-
+            The Safe Number (Creditsafe's identifier on all Companies owned in
+            the Creditsafe Universe) of the company.
+          example: US22384484
+        name:
+          type: string
+          description: The name of the company .
+          example: GOOGLE LLC
+        countryCode:
+          type: string
+          description: ISO/Alpha 2 format country code of the company.
+          example: US
+        address:
+          type: string
+          description: The address of the company.
+          example: VIA PABLO NERUDA, 4, TREZZANO SUL NAVIGLIO, 20090
+        companyStatus:
+          type: string
+          description: The current status of the company
+          example: 1
+          nullable: true
+        creditLimit:
+          type: number
+          description: The credit limit of the company.
+          example: 10000
+          nullable: true
+        ratingCommon:
+          type: string
+          description: The rating score band that the company is in.
+          example: A
+          nullable: true
+        ratingLocal:
+          type: string
+          description: Country specific rating score.
+          example: Not rated - insufficient information to rate
+          nullable: true
+        dateLastEvent:
+          type: string
+          format: date-time
+          description: The date of the most recent event the company has had.
+          example: '2018-06-14T00:59:06'
+          nullable: true
+        dateAdded:
+          type: string
+          format: date-time
+          description: The date the company was added to the portfolio.
+          example: '2020-07-01T00:59:06'
+          nullable: true
+        dateModified:
+          type: string
+          format: date-time
+          description: The date the company was last modified in the portfolio.
+          example: '2020-07-01T00:59:06'
+          nullable: true
+    ConnectMonitoringDeleteCompanyFromPortfolio:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        message:
+          type: string
+          description: A message stating successful deletion.
+          example: Company removed
+    ConnectMonitoringUpdateCompanyDetailsInPortfolioRequest:
+      type: object
+      properties:
+        personalReference:
+          description: >-
+            Field that can be used to add a personal reference against the
+            company in a portfolio.
+          type: string
+        freeText:
+          description: >-
+            Field that can be used to add a free text note to when
+            adding/updating a company to a portfolio.
+          type: string
+        personalLimit:
+          description: >-
+            Field that can be used to add a personal limit number against the
+            company in a portfolio.
+          type: string
+      required:
+        - personalReference
+        - freeText
+        - personalLimit
+    ConnectMonitoringUpdateCompanyInPortfolio:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        message:
+          type: string
+          description: A message stating successful update.
+          example: Company updated successfully
+    ConnectMonitoringListPortfolioEventRules:
+      type: array
+      items:
+        type: object
+        properties:
+          isActive:
+            type: boolean
+            description: >-
+              Shows whether the notification event rule has been enabled for the
+              given portfolio.
+            example: 0
+          ruleCode:
+            type: number
+            description: The unique identifier for the notification event rule.
+            example: 101
+          ruleCountryCode:
+            type: string
+            description: >-
+              The ISO/Alpha 2 format country code for the notification event
+              rule. "XX" is used for global rules that apply to companies from
+              all countries.
+            example: XX
+          ruleType:
+            type: number
+            description: >-
+              The unique identifier of the `ruleType` for the notification event
+              rule.
+            example: 4
+          ruleTypeName:
+            type: string
+            description: >-
+              A short description of the `ruleType` for the notification event
+              rule.
+            example: Rating band change - 3 input
+          name:
+            type: string
+            description: The name for the notification event rule.
+            example: International Rating | Reduce by {0} Band(s) OR Less than Band {1}
+          param0:
+            type: string
+            description: >-
+              Some notification event rules may include input parameters used to
+              tailor the notifications generated to your preference.
+            example: '1'
+          param1:
+            type: string
+            description: >-
+              Some notification event rules may include input parameters used to
+              tailor the notifications generated to your preference.
+            example: A
+          param2:
+            type: string
+            description: >-
+              Some notification event rules may include input parameters used to
+              tailor the notifications generated to your preference.
+            example: A
+    ConnectMonitoringUpdateEventRulesBody:
+      type: object
+      properties:
+        ruleCode:
+          type: integer
+          description: The unique ID of the EventRule
+        isActive:
+          type: integer
+          description: Flag to show if EventRule is active or not. 0 for false, 1 for true.
+        param0:
+          anyOf:
+            - type: string
+            - type: integer
+        param1:
+          anyOf:
+            - type: string
+            - type: integer
+        param2:
+          anyOf:
+            - type: string
+            - type: integer
+      required:
+        - ruleCode
+        - isActive
+    ConnectMonitoringUpdateEventRulesRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/ConnectMonitoringUpdateEventRulesBody'
+    ConnectMonitoringRiskSummary:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        totalCompanies:
+          type: number
+          description: Total Companies in the portfolio
+          example: 66
+        bandACount:
+          type: number
+          example: 20
+        bandApc:
+          type: number
+          example: 40.625
+        bandBCount:
+          type: number
+          example: 17
+        bandBpc:
+          type: number
+          example: 26.5625
+        bandCCount:
+          type: number
+          example: 14
+        bandCpc:
+          type: number
+          example: 21.8775
+        bandDCount:
+          type: number
+          example: 5
+        bandDpc:
+          type: number
+          example: 7.8125
+        bandECount:
+          type: number
+          example: 2
+        bandEpc:
+          type: number
+          example: 3.125
+    ConnectMonitoringCompanyInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: >-
+            The connectId of the company that triggered the `notificationEvent`.
+            A connectId is the primary Company identifier that is used to
+            uniquely identify all companies across Creditsafe's Universe and
+            Partner Network.
+          example: US-X-US22384484
+        safeNumber:
+          type: string
+          description: >-
+            The Safe Number (Creditsafe's identifier on all Companies owned in
+            the Creditsafe Universe) of the company that triggered the
+            `notificationEvent`.
+          example: US22384484
+        name:
+          type: string
+          description: The name of the company that triggered the `notificationEvent`.
+          example: GOOGLE LLC
+        countryCode:
+          type: string
+          description: >-
+            ISO/Alpha 2 format country code of the company that triggered the
+            `notificationEvent`.
+          example: US
+        portfolioId:
+          type: number
+          description: >-
+            The portfolio Id of the portfolio that contains the company that
+            triggered the `notificationEvent`.
+          example: 589960
+        portfolioName:
+          type: string
+          description: >-
+            The name of the portfolio that contains the company that triggered
+            the `notificationEvent`.
+          example: Default
+    ConnectMonitoringAllNotificationsEvents:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        totalCount:
+          type: number
+          description: The total number of events returned for the given company.
+          example: 36
+        data:
+          type: array
+          items:
+            properties:
+              company:
+                $ref: '#/components/schemas/ConnectMonitoringCompanyInfo'
+              eventId:
+                type: number
+                description: >-
+                  The unique identifier of the event that triggered the
+                  generation of the `notificationEvent`. This identifier is
+                  consistent across all portfolios in the Global Monitoring
+                  product.
+                example: 426992366
+              eventDate:
+                type: string
+                format: date-time
+                description: The date that the event occurred.
+                example: '2019-12-06T08:23:37'
+              newValue:
+                type: string
+                nullable: true
+                description: >-
+                  Some events contain an `oldValue` and `newValue` (e.g. a
+                  change in Credit Limit).
+                example: 1600 AMPHITHEATRE PARKWAY, MOUNTAIN VIEW, CA, 94043-1351
+              oldValue:
+                type: string
+                nullable: true
+                description: >-
+                  Some events contain an `oldValue` and `newValue` (e.g. a
+                  change in Credit Limit).
+                example: 1604 AMPHITHEATRE PARKWAY, MOUNTAIN VIEW, CA, 94043-1351
+              notificationEventId:
+                type: number
+                description: >-
+                  The unique identifier for the `notificationEvent`. This
+                  identifier is tied to a specific `eventId` and `portfolioId`.
+                example: 51861887
+              notificationId:
+                type: number
+                description: >-
+                  The unique identifier for the `notificationEvent`. This
+                  identifier is tied to a specific `eventId` and `portfolioId`.
+                example: null
+                nullable: true
+              processedDate:
+                type: string
+                format: date-time
+                description: >-
+                  If the Notification was sent by email, the date will be
+                  populated with when the notification was sent.
+                example: null
+                nullable: true
+              ruleCode:
+                type: number
+                description: >-
+                  The unique identifier for the `ruleCode` that triggered the
+                  generation of the `notificationEvent`.
+                example: 105
+              ruleName:
+                type: string
+                description: >-
+                  The name of the notification event rule that triggered the
+                  generation of the `notificationEvent`.
+                example: Address
+              summary:
+                type: string
+                description: >-
+                  A short description of the notification event rule that
+                  triggered the `notificationEvent`.
+                example: Address Change reported
+                nullable: true
+              ruleText:
+                type: string
+                description: >-
+                  A short description of the notification event rule that
+                  triggered the `notificationEvent`.
+                example: Address Change reported
+                nullable: true
+              localEventCode:
+                type: string
+                description: The local code of the `notificationEvent`.
+                example: LI2013
+                nullable: true
+              isProcessed:
+                type: boolean
+                description: >-
+                  a `true` or `false` flag for each event. Can be updated using
+                  the PATCH endpoint.
+                example: true
+        paging:
+          $ref: '#/components/schemas/ConnectMonitoringPaging'
+    ConnectMonitoringListSharingPermissions:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        data:
+          type: object
+          properties:
+            portfolioId:
+              type: string
+              description: A unique ID assigned to each portfolio.
+              example: '13437356'
+            customerId:
+              type: number
+              description: A unique ID assigned to your customer account.
+              example: 101375376
+            userPermission:
+              type: array
+              items:
+                type: object
+                properties:
+                  csUserId:
+                    type: number
+                    description: >-
+                      The unique ID assigned to the user account the portfolios
+                      are shared with.
+                    example: 101435674
+                  userName:
+                    type: string
+                    description: The username of the user.
+                    example: UPPStage
+                  permission:
+                    type: string
+                    description: The permissions this user has for this portfolio.
+                    example: View, Add, Remove
+    ConnectMonitoringSharePortfolioRequestBody:
+      type: object
+      properties:
+        csUserId:
+          type: integer
+          description: A creditsafe user id.
+        permissions:
+          type: string
+          description: >-
+            Comma separated permissions. "View" permission gets automatically
+            added to the user if "Add", "Edit", "Remove" permissions are set.
+    ConnectMonitoringSharePortfolioRequest:
+      type: object
+      properties:
+        revokeAll:
+          type: string
+          description: >-
+            If set to "true", all user permissions will be revoked for the
+            portfolio. By default set to "false".
+        userPermissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConnectMonitoringSharePortfolioRequestBody'
+    ConnectMonitoringSharePortfolioRequestResponse:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        data:
+          type: object
+          properties:
+            portfolioId:
+              type: string
+              description: A unique ID assigned to each portfolio.
+              example: '13437356'
+            customerId:
+              type: number
+              description: A unique ID assigned to your customer account.
+              example: 101375376
+            status:
+              type: string
+              description: A message about the status of this request.
+              example: Success
+    ConnectMonitoringCompanyEvents:
+      type: object
+      properties:
+        correlationId:
+          type: string
+          description: A unique ID assigned to this request.
+          example: 23921650-c073-11ea-860f-06bc8182190e
+        totalCount:
+          type: number
+          description: The total number of events returned for the given company.
+          example: 1
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              eventId:
+                type: number
+                description: The unique identifier for the event.
+                example: 192873729
+              companyId:
+                type: string
+                description: >-
+                  The Safe Number (Creditsafe's identifier on all Companies
+                  owned in the Creditsafe Universe) of the company that
+                  triggered the event.
+                example: UK00004371
+              portfolioId:
+                type: number
+                description: >-
+                  The portfolio Id of the portfolio that contains the company
+                  that you requested event information for.
+                example: 589960
+              ruleName:
+                type: string
+                description: A short description of the company event.
+                example: Credit Limit Change
+              localEventCode:
+                type: string
+                description: The local event code for the event.
+                example: CL
+              globalEventCode:
+                type: string
+                description: The global event code that has been mapped to the local event.
+                example: CL
+              newValue:
+                type: string
+                description: >-
+                  Some events contain an `oldValue` and `newValue` (e.g. a
+                  change in Credit Limit).
+                example: 7050000
+              oldValue:
+                type: string
+                description: >-
+                  Some events contain an `oldValue` and `newValue` (e.g. a
+                  change in Credit Limit).
+                example: 6100000
+              eventDate:
+                type: string
+                format: date-time
+                description: The date that the event occurred.
+                example: '2019-03-14T22:21:50'
+              createdDate:
+                type: string
+                format: date-time
+                description: >-
+                  The date that the event was created in the Creditsafe
+                  database.
+                example: '2019-03-14T22:21:50'
+        paging:
+          $ref: '#/components/schemas/ConnectMonitoringPaging'
+    ConnectMonitoringEventRulesResponse:
+      type: array
+      items:
+        properties:
+          isActive:
+            type: boolean
+            description: >-
+              Shows whether the notification event rule has been enabled for the
+              given portfolio.
+            example: 0
+          ruleCode:
+            type: number
+            description: The unique identifier for the notification event rule.
+            example: 101
+          ruleCountryCode:
+            type: string
+            description: >-
+              The ISO/Alpha 2 format country code for the notification event
+              rule. "XX" is used for global rules that apply to companies from
+              all countries.
+            example: XX
+          ruleType:
+            type: number
+            description: >-
+              The unique identifier of the `ruleType` for the notification event
+              rule.
+            example: 4
+          ruleTypeName:
+            type: string
+            description: >-
+              A short description of the `ruleType` for the notification event
+              rule.
+            example: Rating band change - 3 input
+          name:
+            type: string
+            description: The name for the notification event rule.
+            example: International Rating | Reduce by {0} Band(s) OR Less than Band {1}
+          param0:
+            type: string
+            description: >-
+              Some notification event rules may include input parameters used to
+              tailor the notifications generated to your preference.
+            example: '1'
+          param1:
+            type: string
+            description: >-
+              Some notification event rules may include input parameters used to
+              tailor the notifications generated to your preference.
+            example: A
+  parameters:
+    gmPage:
+      name: page
+      in: query
+      description: >-
+        Starting page number inGlobal Monitoring is `0`. If all items are
+        displayed on one page this can also be left blank.
+      schema:
+        type: integer
+        default: 0
+    pageSize:
+      name: pageSize
+      in: query
+      description: Number of items to return per Page.
+      schema:
+        type: integer
+    sortBy:
+      name: sortBy
+      in: query
+      description: >-
+        Sort results by this column. Null values of sort column are listed after
+        non-nulls.
+      schema:
+        type: string
+        default: eventId
+        enum:
+          - companyName
+          - countryCode
+          - eventId
+          - eventDate
+    sortDir:
+      name: sortDir
+      in: query
+      description: The direction that you wish to sort results by.
+      schema:
+        type: string
+        default: asc
+        enum:
+          - asc
+          - desc
+    startDate:
+      name: startDate
+      in: query
+      description: The start date on which results are filtered.
+      schema:
+        type: string
+        format: date-time
+    endDate:
+      name: endDate
+      in: query
+      description: The end date on which results are filtered.
+      schema:
+        type: string
+        format: date-time
+    filterByCreatedDate:
+      name: filterByCreatedDate
+      in: query
+      description: >-
+        Set to `true` to filter the Notification Events of the "createdDate"
+        field when using `startDate` and `endDate` parameters. By default this
+        is set to `false`, with the date parameters filtering using the
+        "eventDate" field.
+      schema:
+        type: boolean
+        default: false
+        enum:
+          - false
+          - true
+security:
+  - bearerToken: []
