@@ -15,11 +15,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>jakarta.annotation</groupId>
-            <artifactId>jakarta.annotation-api</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>2.18.2</version>
@@ -30,18 +25,54 @@
             <version>0.2.6</version>
         </dependency>
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.11.4</version>
-            <scope>test</scope>
+            <groupId>io.github.chrimle</groupId>
+            <artifactId>openapi-to-java-records-mustache-templates</artifactId>
+            <version>2.9.5</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.1</version>
         </dependency>
     </dependencies>
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.8.1</version>
+                <executions>
+                    <execution>
+                        <id>unpack-mustache-files</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>io.github.chrimle</groupId>
+                                    <artifactId>openapi-to-java-records-mustache-templates</artifactId>
+                                    <version>2.9.5</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.basedir}/src/main/resources</outputDirectory>
+                                    <includes>**/*.mustache</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.11.0</version>
+                <version>7.13.0</version>
                 <executions>
                     <execution>
                         <id>creditsafe-monitoring-execution</id>
@@ -50,17 +81,18 @@
                         </goals>
                         <configuration>
                             <inputSpec>${project.basedir}/globalMonitoring.yaml</inputSpec>
+                            <templateDirectory>${project.basedir}/src/main/resources/templates</templateDirectory>
 
+                            <generatorName>java</generatorName>
                             <generateModels>true</generateModels>
                             <generateModelTests>false</generateModelTests>
                             <generateModelDocumentation>false</generateModelDocumentation>
                             <generateApis>false</generateApis>
                             <generateSupportingFiles>false</generateSupportingFiles>
 
-                            <o>${project.build.directory}/generated-sources</o>
+                            <outputDir>${project.build.directory}/generated-sources</outputDir>
                             <modelPackage>se.mynt.external.creditsafe.models.v1</modelPackage>
 
-                            <generatorName>java</generatorName>
                             <library>feign</library>
 
                             <configOptions>
@@ -79,13 +111,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <artifactId>maven-s3-wagon</artifactId>
-                <groupId>com.allogy.maven.wagon</groupId>
-                <version>1.2.0</version>
-            </extension>
-        </extensions>
     </build>
 
     <distributionManagement>
