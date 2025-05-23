@@ -111,6 +111,13 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <extension>
+                <artifactId>maven-s3-wagon</artifactId>
+                <groupId>com.allogy.maven.wagon</groupId>
+                <version>1.2.0</version>
+            </extension>
+        </extensions>
     </build>
 
     <distributionManagement>
